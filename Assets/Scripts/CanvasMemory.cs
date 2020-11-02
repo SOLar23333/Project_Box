@@ -6,6 +6,7 @@ public class CanvasMemory : MonoBehaviour
 {
 
     public bool isCanvasEnabled = false;
+    //public bool isOptionCanvasEnabled = false;
 
     private void Awake()
     {

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 public class StartGame : MonoBehaviour
 {
 
     AudioSource audioSource;
     [SerializeField] AudioClip gameStartAudio;
+
 
     // Start is called before the first frame update
     void Start()
@@ -24,11 +26,21 @@ public class StartGame : MonoBehaviour
 
     public void StartNewGame()
     {
-        StartCoroutine(LoadLastLevel(1));
+        string current;
+        try 
+        {
+            CurrentlevelSaving currentlevelSaving = JsonUtility.FromJson<CurrentlevelSaving>( File.ReadAllText( Application.persistentDataPath + "/current_level_save.json" ) );
+            current = currentlevelSaving.current;
+        }
+        catch
+        {
+            current = "T1Level1";
+        }
+        StartCoroutine(LoadLastLevel(current));
     }
 
 
-    IEnumerator LoadLastLevel(int level)
+    IEnumerator LoadLastLevel(string level)
     {
         audioSource.PlayOneShot(gameStartAudio);
         yield return new WaitForSeconds(0.3f);

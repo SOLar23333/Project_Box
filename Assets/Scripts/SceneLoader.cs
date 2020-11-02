@@ -2,6 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.IO;
+
+public class PassedlevelSaving{
+    public string[] passed;
+}
+
+public class CurrentlevelSaving{
+    public string current;
+}
 
 public class SceneLoader : MonoBehaviour
 {
@@ -26,6 +35,9 @@ public class SceneLoader : MonoBehaviour
     [SerializeField] private float boxXiRuTime = 0.5f;
     [SerializeField] private float boxYOffset = 15f;
 
+    private string currentLevelSavePath;
+    private string passedLevelSavePath;
+
     public bool gameEnded = false;
 
     private void Awake()
@@ -35,6 +47,7 @@ public class SceneLoader : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         walls = GameObject.Find("Walls");
         detectors = GameObject.Find("InputDetector");
+        currentLevelTargetCount = boxes.Length;
 
         //For debug only, if you don't enter the level from the main screen, instantiate the clone of canvas memory
         if (GameObject.Find("CanvasMemory") == null)
@@ -58,7 +71,9 @@ public class SceneLoader : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        currentLevelSavePath = Application.persistentDataPath + "/current_level_save.json";
+        passedLevelSavePath = Application.persistentDataPath + "/passed_level_save.json";
+        SaveCurrentLevel ();
     }
 
     // Update is called once per frame
@@ -71,6 +86,7 @@ public class SceneLoader : MonoBehaviour
             {
                 if (!gameEnded)
                 {
+                    SavePassedLevel ();
                     gameEnded = true;
                     audioSource.PlayOneShot(success);
                     //Invoke("LoadNextScene", 1f);
@@ -250,6 +266,8 @@ public class SceneLoader : MonoBehaviour
             yield return null;
         }
         box.transform.position = new Vector3(box.transform.position.x, 0.5f, box.transform.position.z);
+
+        //TODO: Mark for review
         box.GetComponent<BoxMovement>().enabled = true;
 
         //Enable all detectors
@@ -284,6 +302,52 @@ public class SceneLoader : MonoBehaviour
             box.GetComponent<BoxMovement>().enabled = false;
             box.GetComponent<Animator>().SetTrigger("StartXiRu");
         }
+    }
+
+    //SavePart
+    public void SaveCurrentLevel()
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        CurrentlevelSaving currentlevelSaving = new CurrentlevelSaving();
+        currentlevelSaving.current = scene.name;
+        
+        Debug.Log(currentLevelSavePath);
+
+        string jsonData = JsonUtility.ToJson (currentlevelSaving, true);
+        File.WriteAllText (currentLevelSavePath, jsonData);
+    }
+
+
+    public void SavePassedLevel()
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        string[] passed = {"ori"};
+        PassedlevelSaving passedlevelSaving = new PassedlevelSaving();
+        try 
+        {
+            passedlevelSaving = JsonUtility.FromJson<PassedlevelSaving>( File.ReadAllText( Application.persistentDataPath + "/passed_level_save.json" ) );
+            passed = passedlevelSaving.passed;
+        }
+        catch
+        {
+            //passedlevelSaving = passed;
+        }
+        Debug.Log(passed);
+
+        //add current level to passed
+        if (passed == null)
+        {
+            passed = new string[] {"ori"};
+        }
+        List<string> _list = new List<string>(passed);
+        _list.Add(scene.name);
+        passed = _list.ToArray();
+
+        //IO
+        passedlevelSaving.passed = passed;
+        string jsonData = JsonUtility.ToJson (passedlevelSaving, true);
+        File.WriteAllText (passedLevelSavePath, jsonData);
+          
     }
 
 }

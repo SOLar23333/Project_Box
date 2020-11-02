@@ -64,6 +64,29 @@ public class KeyboardDetector : MonoBehaviour
         {
             return SwipeDirection.D;
         }
+        else if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (sceneLoader.canvas.activeSelf)
+            {
+                Debug.Log("1");
+                canvasMemory.isCanvasEnabled = false;
+                sceneLoader.canvas.GetComponent<UIController>().GraduallyDisappearCanvas();
+                StartCoroutine(sceneLoader.canvas.GetComponent<UIController>().GraduallyDisappearCanvas());
+                //canvas.gameObject.SetActive(false);
+            }
+            else
+            {
+                Debug.Log("0");
+                canvasMemory.isCanvasEnabled = true;
+                sceneLoader.canvas.gameObject.SetActive(true);
+                StartCoroutine(sceneLoader.canvas.GetComponent<UIController>().GraduallyAppearCanvas());
+                
+                //touch to disable Option Page  
+                //GameObject optionCanvas = GameObject.Find("OptionCanvas");
+                //StartCoroutine(optionCanvas.GraduallyDisappearCanvas());
+            }
+            return SwipeDirection.NULL;
+        }
         else
         {
             return SwipeDirection.NULL;

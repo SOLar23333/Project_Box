@@ -11,6 +11,7 @@ public class UIController : MonoBehaviour
     private CanvasGroup canvasGroup;
     private float appearTime = 0.3f;
 
+    //To show current level
     private void OnEnable()
     {
         currentLevel = GameObject.Find("CurrentLevel");

@@ -103,6 +103,8 @@ public class SwipeDetector : MonoBehaviour
                         canvasMemory.isCanvasEnabled = true;
                         sceneLoader.canvas.gameObject.SetActive(true);
                         StartCoroutine(sceneLoader.canvas.GetComponent<UIController>().GraduallyAppearCanvas());
+                        GameObject optionCanvas = GameObject.Find("OptionCanvas");
+                        StartCoroutine(optionCanvas.GetComponent<UIController>().GraduallyDisappearCanvas());
                     }
                 }
             }
